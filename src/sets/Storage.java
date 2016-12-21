@@ -11,9 +11,8 @@ public class Storage implements Keeping{
 	Map<Set<Integer>, Integer> sets = new HashMap<>();
 	int duplicates = 0;
 	int nonDuplicates = 0;
-	Set<Integer> nonDuplicatesRef = new HashSet<>();
-	Set<Integer> DuplicatesRef = new HashSet<>();
-	
+	int maxDuplicates = 0;
+			
 	public int get(Set<Integer> set){
 		return sets.get(set);
 	}
@@ -24,32 +23,33 @@ public class Storage implements Keeping{
 	
 	public Set<Entry<Set<Integer>, Integer>> entrySet(){
 		return sets.entrySet();
-	}
-	
-	//public static void main(String[] args) {}
+	}	
 	
 	public Storage() {}
 
 	@Override
-	public boolean insertSet(String string) {		
-		
+	public boolean insertSet(String string) {				
 		Set<Integer> iset = new HashSet<>();
 		
 		for (String str : string.split(",")) {
 			try {
 				iset.add(Integer.parseInt(str));
 			} catch (NumberFormatException nfe) {
-				System.out.println("Wrong format of input string!");
+				System.out.println("Wrong format of input token in [" + str + "]");
 			}
 		}		
 		boolean alreadyExists = sets.keySet().contains(iset);		
 		int appearance = 0;
 		if (alreadyExists) {
 			appearance = sets.get(iset);
-			duplicates++;
+			if (appearance == 1) {
+				duplicates ++;
+				nonDuplicates --;
+				}
+			duplicates ++;
 			}	
-		else {
-			nonDuplicates++;
+		else{
+			nonDuplicates ++;
 			}
 		sets.put(iset, appearance+1);
 		return alreadyExists;
@@ -88,6 +88,24 @@ public class Storage implements Keeping{
 		return ret;
 	}
 	
+	public Set<Integer> getMostDuplicates(){
+		Set<Integer> ret = new HashSet<>();
+		int max = 0;
+		for (Entry<Set<Integer>, Integer> set : sets.entrySet()) {
+			Set<Integer> key = set.getKey();
+			int value = set.getValue();
+			if (value > max){
+				max = value;
+				ret = key;
+				}
+			}
+		maxDuplicates = max;
+		return ret;
+	}
+	
+	public int getMaxDuplicates(){
+		return maxDuplicates;
+	}
 	
 	public String dumpSets(){
 		StringBuffer dump = new StringBuffer();
@@ -100,15 +118,6 @@ public class Storage implements Keeping{
 		return dump.toString();
 	}
 
-	public String prettyDump(){
-		StringBuffer dump = new StringBuffer();
-		for (Entry<Set<Integer>, Integer> set : sets.entrySet()) {
-			dump.append(set.getKey());
-			dump.append(" : ");
-			dump.append(set.getValue());
-			dump.append("\n");
-		}
-		return dump.toString();
-	}
+	
 	
 }
